@@ -4,6 +4,7 @@ import express from 'express';
 import { buildSchema } from 'type-graphql';
 import ormConfig from './mikro-orm.config';
 import { PostResolver } from './resolvers/Post';
+import { UserResolver } from './resolvers/User';
 
 async function main () {
 	const orm = await MikroORM.init(ormConfig);
@@ -13,7 +14,7 @@ async function main () {
 
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
-			resolvers: [ PostResolver ],
+			resolvers: [ PostResolver, UserResolver ],
 			validate: false
 		}),
 		context: () => ({
@@ -22,7 +23,6 @@ async function main () {
 	});
 
 	apolloServer.applyMiddleware({ app });
-
 	app.listen(5000, () => {
 		console.log('Server listening on port 5000');
 	});
