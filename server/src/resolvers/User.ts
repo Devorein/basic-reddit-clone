@@ -25,16 +25,48 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
-	@Mutation(() => User)
+	@Mutation(() => UserResponse)
 	async register (
 		@Arg('input', () => UsernamePasswordInput)
 		input: UsernamePasswordInput,
 		@Ctx() { em }: Context
 	) {
+		if (input.username.length <= 4)
+			return {
+				errors: [
+					{
+						field: 'username',
+						message: 'Username must be at least 5 characters long'
+					}
+				]
+			};
+
+		if (input.password.length <= 7)
+			return {
+				errors: [
+					{
+						field: 'password',
+						message: 'Password must be at least 8 characters long'
+					}
+				]
+			};
+
 		const hashedPassword = await argon2.hash(input.password);
 		const user = em.create(User, { password: hashedPassword, username: input.username });
-		await em.persistAndFlush(user);
-		return user;
+		try {
+			await em.persistAndFlush(user);
+		} catch (err) {
+			if (err.code === '23505' || err.detail.includes('already exists'))
+				return {
+					errors: [
+						{
+							field: 'username',
+							message: 'A user with that username already exists'
+						}
+					]
+				};
+		}
+		return { user };
 	}
 
 	@Mutation(() => UserResponse)
