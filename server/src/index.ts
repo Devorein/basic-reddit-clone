@@ -29,6 +29,7 @@ async function main () {
 				secure: __PROD__,
 				sameSite: 'lax'
 			},
+			saveUninitialized: false,
 			secret: 'redis_secret',
 			resave: false
 		})
@@ -45,7 +46,6 @@ async function main () {
 			res
 		})
 	});
-
 	apolloServer.applyMiddleware({ app });
 	app.listen(5000, () => {
 		console.log('Server listening on port 5000');
