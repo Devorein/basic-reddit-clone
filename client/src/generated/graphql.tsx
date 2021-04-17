@@ -94,13 +94,13 @@ export type UsernamePasswordInput = {
   password: Scalars['String'];
 };
 
-export type CreateUserMutationVariables = Exact<{
+export type RegisterMutationVariables = Exact<{
   username: Scalars['String'];
   password: Scalars['String'];
 }>;
 
 
-export type CreateUserMutation = (
+export type RegisterMutation = (
   { __typename?: 'Mutation' }
   & { register: (
     { __typename?: 'UserResponse' }
@@ -115,8 +115,8 @@ export type CreateUserMutation = (
 );
 
 
-export const CreateUserDocument = gql`
-    mutation CreateUser($username: String!, $password: String!) {
+export const RegisterDocument = gql`
+    mutation Register($username: String!, $password: String!) {
   register(input: {username: $username, password: $password}) {
     user {
       username
@@ -132,6 +132,6 @@ export const CreateUserDocument = gql`
 }
     `;
 
-export function useCreateUserMutation() {
-  return Urql.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument);
+export function useRegisterMutation() {
+  return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
 };

@@ -1,32 +1,23 @@
 import { Button } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
+import { useRouter } from "next/router";
 import React from 'react';
-import { useMutation } from "urql";
 import InputField from '../components/InputField';
-
-const REGISTER_MUTATION = `
-mutation CreateUser($username: String!, $password:String!){
-  register(input:{
-    username: $username,
-    password: $password
-  }){
-    user{
-      username
-      updatedAt
-      id
-      createdAt
-    }
-    errors{
-      field
-      message
-    }
-  }
-}`
+import { useRegisterMutation } from "../generated/graphql";
+import { toErrorMap } from "../utils/toErrorMap";
 
 const Register = () => {
-  const [, register] = useMutation(REGISTER_MUTATION);
+  const router = useRouter();
+  const [, register] = useRegisterMutation();
   return (
-    <Formik initialValues={{ username: '', password: '' }} onSubmit={(values) => register(values)}>
+    <Formik initialValues={{ username: '', password: '' }} onSubmit={async (values, { setErrors }) => {
+      const response = await register(values);
+      if (response.data?.register.errors)
+        setErrors(toErrorMap(response.data.register.errors));
+      else if (response.data?.register.user) {
+        router.push("/")
+      }
+    }}>
       {({ isSubmitting, values, handleChange }) =>
         <Form>
           <InputField name="username" placeholder="johndoe" label="Username" />
