@@ -1,5 +1,5 @@
 import argon2 from 'argon2';
-import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Resolver } from 'type-graphql';
+import { Arg, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from 'type-graphql';
 import User from '../entities/User';
 import { Context } from '../types';
 
@@ -25,11 +25,18 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+	@Query(() => User, { nullable: true })
+	async me (@Ctx() { req, em }: Context) {
+		// You're not logged in
+		if (!req.session.user_id) return null;
+		return await em.findOne(User, { id: req.session.user_id });
+	}
+
 	@Mutation(() => UserResponse)
 	async register (
 		@Arg('input', () => UsernamePasswordInput)
 		input: UsernamePasswordInput,
-		@Ctx() { em }: Context
+		@Ctx() { em, req }: Context
 	) {
 		if (input.username.length <= 4)
 			return {
@@ -66,6 +73,7 @@ export class UserResolver {
 					]
 				};
 		}
+		req.session.user_id = user.id;
 		return { user };
 	}
 
