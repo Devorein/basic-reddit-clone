@@ -11,7 +11,7 @@ const Register = () => {
   const [, register] = useRegisterMutation();
   return (
     <Formik initialValues={{ username: '', password: '' }} onSubmit={async (values, { setErrors }) => {
-      const response = await register(values);
+      const response = await register({ input: values });
       if (response.data?.register.errors)
         setErrors(toErrorMap(response.data.register.errors));
       else if (response.data?.register.user) {

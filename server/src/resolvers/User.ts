@@ -62,19 +62,31 @@ export class UserResolver {
 		const user = em.create(User, { password: hashedPassword, username: input.username });
 		try {
 			await em.persistAndFlush(user);
+			req.session.user_id = user.id;
+			return {
+				user
+			};
 		} catch (err) {
-			if (err.code === '23505' || err.detail.includes('already exists'))
+			if (err.code === '23505') {
 				return {
 					errors: [
 						{
 							field: 'username',
-							message: 'A user with that username already exists'
+							message: 'username already exists'
 						}
 					]
 				};
+			} else {
+				return {
+					errors: [
+						{
+							field: 'unknown',
+							message: 'Unknown error occurred in the backend'
+						}
+					]
+				};
+			}
 		}
-		req.session.user_id = user.id;
-		return { user };
 	}
 
 	@Mutation(() => UserResponse)

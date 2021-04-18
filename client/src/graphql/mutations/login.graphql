@@ -1,5 +1,5 @@
-mutation Register($input: UsernamePasswordInput!){
-  register(input: $input){
+mutation Login($input: UsernamePasswordInput!){
+  login(input: $input){
     user{
       username
       updatedAt
