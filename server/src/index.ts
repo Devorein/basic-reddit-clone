@@ -6,7 +6,7 @@ import express from 'express';
 import expressSession from 'express-session';
 import redis from 'redis';
 import { buildSchema } from 'type-graphql';
-import { __PROD__ } from './constants';
+import { COOKIE_NAME, __PROD__ } from './constants';
 import ormConfig from './mikro-orm.config';
 import { PostResolver } from './resolvers/Post';
 import { UserResolver } from './resolvers/User';
@@ -27,7 +27,7 @@ async function main () {
 	);
 	app.use(
 		expressSession({
-			name: 'qid',
+			name: COOKIE_NAME,
 			store: new RedisStore({ client: RedisClient, disableTouch: true, disableTTL: true }),
 			cookie: {
 				maxAge: 1000 * 60 * 60 * 24 * 30, // a month
