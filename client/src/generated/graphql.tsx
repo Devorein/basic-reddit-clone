@@ -107,16 +107,20 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = (
   { __typename?: 'Mutation' }
-  & { login: (
-    { __typename?: 'UserResponse' }
-    & { user?: Maybe<(
-      { __typename?: 'User' }
-      & UserInfoFragment
-    )>, errors?: Maybe<Array<(
-      { __typename?: 'FieldError' }
-      & Pick<FieldError, 'field' | 'message'>
-    )>> }
-  ) }
+  & {
+    login: (
+      { __typename?: 'UserResponse' }
+      & {
+        user?: Maybe<(
+          { __typename?: 'User' }
+          & UserInfoFragment
+        )>, errors?: Maybe<Array<(
+          { __typename?: 'FieldError' }
+          & Pick<FieldError, 'field' | 'message'>
+        )>>
+      }
+    )
+  }
 );
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
@@ -134,16 +138,20 @@ export type RegisterMutationVariables = Exact<{
 
 export type RegisterMutation = (
   { __typename?: 'Mutation' }
-  & { register: (
-    { __typename?: 'UserResponse' }
-    & { user?: Maybe<(
-      { __typename?: 'User' }
-      & UserInfoFragment
-    )>, errors?: Maybe<Array<(
-      { __typename?: 'FieldError' }
-      & Pick<FieldError, 'field' | 'message'>
-    )>> }
-  ) }
+  & {
+    register: (
+      { __typename?: 'UserResponse' }
+      & {
+        user?: Maybe<(
+          { __typename?: 'User' }
+          & UserInfoFragment
+        )>, errors?: Maybe<Array<(
+          { __typename?: 'FieldError' }
+          & Pick<FieldError, 'field' | 'message'>
+        )>>
+      }
+    )
+  }
 );
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
@@ -151,10 +159,25 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MeQuery = (
   { __typename?: 'Query' }
-  & { me?: Maybe<(
-    { __typename?: 'User' }
-    & UserInfoFragment
-  )> }
+  & {
+    me?: Maybe<(
+      { __typename?: 'User' }
+      & UserInfoFragment
+    )>
+  }
+);
+
+export type PostsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PostsQuery = (
+  { __typename?: 'Query' }
+  & {
+    posts: Array<(
+      { __typename?: 'Post' }
+      & Pick<Post, 'id' | 'createdAt' | 'title'>
+    )>
+  }
 );
 
 export const UserInfoFragmentDoc = gql`
@@ -216,4 +239,17 @@ export const MeDocument = gql`
 
 export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'> = {}) {
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
+};
+export const PostsDocument = gql`
+    query Posts {
+  posts {
+    id
+    createdAt
+    title
+  }
+}
+    `;
+
+export function usePostsQuery(options: Omit<Urql.UseQueryArgs<PostsQueryVariables>, 'query'> = {}) {
+  return Urql.useQuery<PostsQuery>({ query: PostsDocument, ...options });
 };
