@@ -96,11 +96,12 @@ export class UserResolver {
 		@Ctx() { em, req }: Context
 	) {
 		const user = await em.findOne(User, { username: input.username });
+		console.log(user);
 		if (!user) {
 			return {
 				errors: [
 					{
-						name: 'username',
+						field: 'username',
 						message: "Couldn't find a user with that username"
 					}
 				]
@@ -112,7 +113,7 @@ export class UserResolver {
 			return {
 				errors: [
 					{
-						name: 'password',
+						field: 'password',
 						message: 'Invalid password'
 					}
 				]

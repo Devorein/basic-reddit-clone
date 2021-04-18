@@ -18,7 +18,7 @@ const Register = () => {
         router.push("/")
       }
     }}>
-      {({ isSubmitting, values, handleChange }) =>
+      {({ isSubmitting }) =>
         <Form>
           <InputField name="username" placeholder="johndoe" label="Username" />
           <InputField name="password" placeholder="password" label="Password" type="password" />
