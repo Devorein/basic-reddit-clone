@@ -1,4 +1,4 @@
-import { Box, Flex, Link } from '@chakra-ui/react';
+import { Box, Button, Flex, Link } from '@chakra-ui/react';
 import NextLink from "next/link";
 import React from 'react';
 import { useMeQuery } from '../generated/graphql';
@@ -23,7 +23,10 @@ const Navbar: React.FC<NavbarProps> = ({ }) => {
       </NextLink>
     </>
   } else {
-    body = <Box>{data.me.username}</Box>
+    body = <Flex>
+      <Box mr="3" >{data.me.username}</Box>
+      <Button variant="link">Logout</Button>
+    </Flex>
   }
   return (<Flex bg="tomato" p={4}>
     <Box ml="auto" color="white">
