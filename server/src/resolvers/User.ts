@@ -5,9 +5,10 @@ import User from '../entities/User';
 import { Context } from '../types';
 
 @InputType()
-class UsernamePasswordInput {
+class UserDataInput {
 	@Field() username: string;
 	@Field() password: string;
+	@Field() email: string;
 }
 
 @ObjectType()
@@ -35,10 +36,20 @@ export class UserResolver {
 
 	@Mutation(() => UserResponse)
 	async register (
-		@Arg('input', () => UsernamePasswordInput)
-		input: UsernamePasswordInput,
+		@Arg('input', () => UserDataInput)
+		input: UserDataInput,
 		@Ctx() { em, req }: Context
 	) {
+		if (!input.email.includes('@'))
+			return {
+				errors: [
+					{
+						field: 'email',
+						message: 'Invalid email'
+					}
+				]
+			};
+
 		if (input.username.length <= 4)
 			return {
 				errors: [
@@ -60,7 +71,7 @@ export class UserResolver {
 			};
 
 		const hashedPassword = await argon2.hash(input.password);
-		const user = em.create(User, { password: hashedPassword, username: input.username });
+		const user = em.create(User, { password: hashedPassword, username: input.username, email: input.email });
 		try {
 			await em.persistAndFlush(user);
 			req.session.user_id = user.id;
@@ -92,8 +103,8 @@ export class UserResolver {
 
 	@Mutation(() => UserResponse)
 	async login (
-		@Arg('input', () => UsernamePasswordInput)
-		input: UsernamePasswordInput,
+		@Arg('input', () => UserDataInput)
+		input: UserDataInput,
 		@Ctx() { em, req }: Context
 	) {
 		const user = await em.findOne(User, { username: input.username });
