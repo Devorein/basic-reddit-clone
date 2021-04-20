@@ -21,8 +21,8 @@ export class UserResolver {
 		input: UserDataInput,
 		@Ctx() { em, req }: Context
 	) {
-		const validationErrors = validateRegister(input);
-		if (validationErrors !== undefined) return validationErrors;
+		const errors = validateRegister(input);
+		if (errors !== undefined) return { errors };
 
 		const hashedPassword = await argon2.hash(input.password);
 		const user = em.create(User, {
