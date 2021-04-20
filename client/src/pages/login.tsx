@@ -12,8 +12,8 @@ const Login = () => {
   const router = useRouter();
   const [, login] = useLoginMutation();
   return (
-    <Formik initialValues={{ username: '', password: '' }} onSubmit={async (values, { setErrors }) => {
-      const response = await login({ input: values });
+    <Formik initialValues={{ usernameOrEmail: '', password: '' }} onSubmit={async (values, { setErrors }) => {
+      const response = await login(values);
       if (response.data?.login.errors)
         setErrors(toErrorMap(response.data.login.errors));
       else if (response.data?.login.user)
@@ -21,7 +21,7 @@ const Login = () => {
     }}>
       {({ isSubmitting }) =>
         <Form>
-          <InputField name="username" placeholder="johndoe" label="Username" />
+          <InputField name="usernameOrEmail" placeholder="johndoe" label="Username Or Email" />
           <InputField name="password" placeholder="password" label="Password" type="password" />
           <Button colorScheme="teal" mt={5} isLoading={isSubmitting} type="submit">Login</Button>
         </Form>

@@ -75,7 +75,7 @@ export class UserResolver {
 			return {
 				errors: [
 					{
-						field: 'username',
+						field: 'usernameOrEmail',
 						message: "Couldn't find a user with that username"
 					}
 				]
