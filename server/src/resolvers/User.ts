@@ -17,6 +17,51 @@ export class UserResolver {
 		return await em.findOne(User, { id: req.session.user_id });
 	}
 
+	@Mutation(() => UserResponse)
+	async forgetPassword (
+		@Arg('token', () => String)
+		token: string,
+		@Arg('newPassword', () => String)
+		newPassword: string,
+		@Ctx() { req, em, redis }: Context
+	): Promise<UserResponse> {
+		if (newPassword.length <= 4)
+			return {
+				errors: [
+					{
+						field: 'newPassword',
+						message: 'Password must be greater than 4 characters'
+					}
+				]
+			};
+
+		const userId = await redis.get(FORGET_PASSWORD_PREFIX + token);
+		if (!userId)
+			return {
+				errors: [
+					{
+						field: 'token',
+						message: 'token expired'
+					}
+				]
+			};
+		const user = await em.findOne(User, { id: parseInt(userId) });
+		if (!user)
+			return {
+				errors: [
+					{
+						field: 'token',
+						message: 'User no longer exists'
+					}
+				]
+			};
+
+		user.password = await argon2.hash(newPassword);
+		req.session.user_id = user.id;
+		await em.persistAndFlush(user);
+		return { user };
+	}
+
 	@Mutation(() => Boolean)
 	async forgotPassword (
 		@Arg('email', () => String)
