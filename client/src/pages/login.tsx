@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Button, Flex } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
@@ -23,7 +23,10 @@ const Login = () => {
         <Form>
           <InputField name="usernameOrEmail" placeholder="johndoe" label="Username Or Email" />
           <InputField name="password" placeholder="password" label="Password" type="password" />
-          <Button colorScheme="teal" mt={5} isLoading={isSubmitting} type="submit">Login</Button>
+          <Flex justifyContent="space-between">
+            <Button colorScheme="teal" m={5} isLoading={isSubmitting} type="submit">Login</Button>
+            <Button colorScheme="teal" m={5} onClick={() => router.push("/forgot-password")}>Forgot Password?</Button>
+          </Flex>
         </Form>
       }
     </Formik>
