@@ -15,7 +15,7 @@ import { PostResolver } from './resolvers/Post';
 import { UserResolver } from './resolvers/User';
 
 async function main () {
-	await createConnection({
+	const conn = await createConnection({
 		type: 'postgres',
 		database: 'lireddit2',
 		username: 'postgres',
@@ -25,6 +25,8 @@ async function main () {
 		migrations: [ path.join(__dirname, '/migrations/*') ],
 		entities: [ User, Post ]
 	});
+
+	await conn.runMigrations();
 
 	const app = express();
 
