@@ -1,5 +1,5 @@
 import argon2 from 'argon2';
-import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 import { getConnection } from 'typeorm';
 import { v4 } from 'uuid';
 import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from '../constants';
@@ -17,6 +17,12 @@ export class UserResolver {
 		// You're not logged in
 		if (!req.session.user_id) return null;
 		return User.findOne(req.session.user_id);
+	}
+
+	@FieldResolver(() => String)
+	email (@Root() user: User, @Ctx() ctx: Context) {
+		if (ctx.req.session.user_id === user.id) return user.email;
+		else return '';
 	}
 
 	@Mutation(() => UserResponse)
