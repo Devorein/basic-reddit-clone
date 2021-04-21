@@ -29,7 +29,8 @@ export default class Post extends BaseEntity{
   @Field(()=> User)
   @ManyToOne(()=> User, user=>user.posts)
   creator: User;
-  
+
+  @Field(()=> [Upvote])
   @OneToMany(()=> Upvote, upvote=>upvote.post)
   upvotes: Upvote[]
   

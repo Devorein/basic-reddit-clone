@@ -16,6 +16,25 @@ export class PostResolver {
     return root.text.split(".").slice(0, lines ?? 1).join(".")+".";
   }
 
+  @Mutation(()=>Boolean)
+  async upvote(@Arg('postId', ()=> Int) postId: number, @Arg('amount', ()=> Int) amount: number, @Ctx() ctx: Context){
+    const point = amount < 0 ? -1  : amount > 0 ? 1 : 0;
+    const user_id = ctx.req.session.user_id;
+    await getConnection().query(`
+      START TRANSACTION;
+
+      INSERT INTO upvote ("userId", "postId", value)
+      VALUES(${user_id}, ${postId}, ${point});
+
+      UPDATE post
+      SET points = points + ${point}
+      WHERE id = ${postId};
+
+      COMMIT;
+      `,);
+    return true;
+  }
+
 	@Query(() => PaginatedPosts)
 	async posts (
 		@Arg('limit', () => Int)

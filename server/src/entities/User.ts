@@ -21,9 +21,11 @@ export default class User extends BaseEntity{
   @Column()
   password!: string;
 
+  @Field(()=> [Post])
   @OneToMany(()=> Post, post=>post.creator)
   posts: Post[]
   
+  @Field(()=> [Upvote])
   @OneToMany(()=> Upvote, upvote=>upvote.user)
   upvotes: Upvote[]
 

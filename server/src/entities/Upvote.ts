@@ -3,6 +3,7 @@ import { BaseEntity, Column, Entity, ManyToOne, PrimaryColumn } from "typeorm";
 import Post from "./Post";
 import User from "./User";
 
+
 @Entity()
 @ObjectType()
 export default class Upvote extends BaseEntity{
