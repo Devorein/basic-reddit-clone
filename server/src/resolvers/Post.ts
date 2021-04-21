@@ -1,4 +1,5 @@
 import { Arg, Int, Mutation, Query, Resolver } from 'type-graphql';
+import { getConnection } from 'typeorm';
 import Post from '../entities/Post';
 
 @Resolver()
@@ -21,7 +22,15 @@ export class PostResolver {
 		@Arg('title', () => String)
 		title: string
 	): Promise<Post> {
-		return Post.create({ title }).save();
+		return (await getConnection()
+			.createQueryBuilder()
+			.insert()
+			.into(Post)
+			.values({
+				title
+			})
+			.returning('*')
+			.execute()).raw[0];
 	}
 
 	@Mutation(() => Post, { nullable: true })

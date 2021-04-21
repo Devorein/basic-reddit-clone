@@ -101,7 +101,7 @@ export class UserResolver {
 				email: input.email
 			})
 			.returning('*')
-			.execute()).raw;
+			.execute()).raw[0];
 
 		try {
 			req.session.user_id = user.id;

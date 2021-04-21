@@ -12,10 +12,6 @@
   "author": "Safwan Shaheer <devorein00@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@mikro-orm/cli": "^4.3.2",
-    "@mikro-orm/core": "^4.3.2",
-    "@mikro-orm/migrations": "^4.3.2",
-    "@mikro-orm/postgresql": "^4.3.2",
     "apollo-server-express": "^2.23.0",
     "argon2": "^0.27.2",
     "connect-redis": "^5.1.0",

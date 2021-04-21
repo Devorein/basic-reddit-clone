@@ -14,7 +14,7 @@ import { PostResolver } from './resolvers/Post';
 import { UserResolver } from './resolvers/User';
 
 async function main () {
-	const conn = await createConnection({
+	await createConnection({
 		type: 'postgres',
 		database: 'lireddit2',
 		username: 'postgres',
