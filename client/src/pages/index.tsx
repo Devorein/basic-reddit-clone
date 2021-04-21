@@ -7,7 +7,11 @@ import { useMeQuery, usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = () => {
-  const [{ data }] = usePostsQuery();
+  const [{ data }] = usePostsQuery({
+    variables: {
+      limit: 10
+    }
+  });
   const [{ data: meData, fetching }] = useMeQuery();
   return (
     <Layout>
