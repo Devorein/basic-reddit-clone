@@ -12,11 +12,11 @@ const CreatePost = () => {
   const router = useRouter();
   const [, createPost] = useCreatePostMutation();
   return <Layout><Formik initialValues={{ text: '', title: '' }} onSubmit={async (values) => {
-    await createPost({ input: values })
-    router.push("/");
+    const response = await createPost({ input: values })
+    if (!response.error)
+      router.push("/");
   }}>
     {({ isSubmitting }) =>
-
       <Form>
         <InputField name="title" placeholder="title" label="Title" />
         <InputField name="text" placeholder="text" label="Text" textarea />
