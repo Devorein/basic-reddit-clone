@@ -4,6 +4,7 @@ import cors from 'cors';
 import express from 'express';
 import expressSession from 'express-session';
 import Redis from 'ioredis';
+import path from 'path';
 import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
@@ -21,6 +22,7 @@ async function main () {
 		password: 'root',
 		logging: true,
 		synchronize: true,
+		migrations: [ path.join(__dirname, '/migrations/*') ],
 		entities: [ User, Post ]
 	});
 
