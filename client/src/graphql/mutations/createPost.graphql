@@ -1,4 +1,4 @@
-mutation CreatePost($input: PostInput!){
+mutation CreatePost($input: PostInput!, $lines: Int = 1){
   createPost(input: $input){
     ...PostInfo
   }

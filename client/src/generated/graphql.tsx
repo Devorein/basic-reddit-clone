@@ -79,6 +79,12 @@ export type Post = {
   points: Scalars['Int'];
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
+  textSnippet: Scalars['String'];
+};
+
+
+export type PostTextSnippetArgs = {
+  lines?: Maybe<Scalars['Int']>;
 };
 
 export type PostInput = {
@@ -132,7 +138,7 @@ export type FieldErrorInfoFragment = (
 
 export type PostInfoFragment = (
   { __typename?: 'Post' }
-  & Pick<Post, 'id' | 'text' | 'title' | 'creatorId' | 'points' | 'createdAt' | 'updatedAt'>
+  & Pick<Post, 'id' | 'textSnippet' | 'title' | 'creatorId' | 'points' | 'createdAt' | 'updatedAt'>
 );
 
 export type UserInfoFragment = (
@@ -167,6 +173,7 @@ export type ChangePasswordMutation = (
 
 export type CreatePostMutationVariables = Exact<{
   input: PostInput;
+  lines?: Maybe<Scalars['Int']>;
 }>;
 
 
@@ -237,6 +244,7 @@ export type MeQuery = (
 export type PostsQueryVariables = Exact<{
   limit: Scalars['Int'];
   cursor?: Maybe<Scalars['String']>;
+  lines?: Maybe<Scalars['Int']>;
 }>;
 
 
@@ -251,7 +259,7 @@ export type PostsQuery = (
 export const PostInfoFragmentDoc = gql`
     fragment PostInfo on Post {
   id
-  text
+  textSnippet(lines: $lines)
   title
   creatorId
   points
@@ -294,7 +302,7 @@ export function useChangePasswordMutation() {
   return Urql.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument);
 };
 export const CreatePostDocument = gql`
-    mutation CreatePost($input: PostInput!) {
+    mutation CreatePost($input: PostInput!, $lines: Int = 1) {
   createPost(input: $input) {
     ...PostInfo
   }
@@ -356,7 +364,7 @@ export function useMeQuery(options: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'q
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 };
 export const PostsDocument = gql`
-    query Posts($limit: Int!, $cursor: String) {
+    query Posts($limit: Int!, $cursor: String, $lines: Int = 1) {
   posts(limit: $limit, cursor: $cursor) {
     ...PostInfo
   }
