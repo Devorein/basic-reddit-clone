@@ -1,5 +1,6 @@
 import argon2 from 'argon2';
 import { Arg, Ctx, Mutation, Query, Resolver } from 'type-graphql';
+import { getConnection } from 'typeorm';
 import { v4 } from 'uuid';
 import { COOKIE_NAME, FORGET_PASSWORD_PREFIX } from '../constants';
 import User from '../entities/User';
@@ -11,10 +12,10 @@ import { validateRegister } from '../utils/validateRegister';
 @Resolver()
 export class UserResolver {
 	@Query(() => User, { nullable: true })
-	async me (@Ctx() { req, em }: Context) {
+	me (@Ctx() { req }: Context): null | Promise<User | undefined> {
 		// You're not logged in
 		if (!req.session.user_id) return null;
-		return await em.findOne(User, { id: req.session.user_id });
+		return User.findOne(req.session.user_id);
 	}
 
 	@Mutation(() => UserResponse)
@@ -23,7 +24,7 @@ export class UserResolver {
 		token: string,
 		@Arg('newPassword', () => String)
 		newPassword: string,
-		@Ctx() { req, em, redis }: Context
+		@Ctx() { req, redis }: Context
 	): Promise<UserResponse> {
 		if (newPassword.length <= 4)
 			return {
@@ -45,7 +46,8 @@ export class UserResolver {
 					}
 				]
 			};
-		const user = await em.findOne(User, { id: parseInt(userId) });
+		const intUserId = parseInt(userId);
+		const user = await User.findOne(intUserId);
 		if (!user)
 			return {
 				errors: [
@@ -56,9 +58,10 @@ export class UserResolver {
 				]
 			};
 
-		user.password = await argon2.hash(newPassword);
+		const hashedPassword = await argon2.hash(newPassword);
+		user.password = hashedPassword;
 		req.session.user_id = user.id;
-		await em.persistAndFlush(user);
+		await User.update(intUserId, { password: hashedPassword });
 		await redis.del(key);
 		return { user };
 	}
@@ -67,9 +70,9 @@ export class UserResolver {
 	async forgotPassword (
 		@Arg('email', () => String)
 		email: string,
-		@Ctx() { em, redis }: Context
-	) {
-		const user = await em.findOne(User, { email });
+		@Ctx() { redis }: Context
+	): Promise<Boolean> {
+		const user = await User.findOne({ where: { email } });
 		if (!user) return true;
 
 		const token = v4();
@@ -82,19 +85,25 @@ export class UserResolver {
 	async register (
 		@Arg('input', () => UserDataInput)
 		input: UserDataInput,
-		@Ctx() { em, req }: Context
-	) {
+		@Ctx() { req }: Context
+	): Promise<UserResponse> {
 		const errors = validateRegister(input);
 		if (errors !== undefined) return { errors };
 
 		const hashedPassword = await argon2.hash(input.password);
-		const user = em.create(User, {
-			password: hashedPassword,
-			username: input.username.toLowerCase(),
-			email: input.email
-		});
+		const user = (await getConnection()
+			.createQueryBuilder()
+			.insert()
+			.into(User)
+			.values({
+				password: hashedPassword,
+				username: input.username.toLowerCase(),
+				email: input.email
+			})
+			.returning('*')
+			.execute()).raw;
+
 		try {
-			await em.persistAndFlush(user);
 			req.session.user_id = user.id;
 			return {
 				user
@@ -128,12 +137,11 @@ export class UserResolver {
 		usernameOrEmail: string,
 		@Arg('password', () => String)
 		password: string,
-		@Ctx() { em, req }: Context
+		@Ctx() { req }: Context
 	) {
-		const user = await em.findOne(
-			User,
-			usernameOrEmail.includes('@') ? { email: usernameOrEmail } : { username: usernameOrEmail.toLowerCase() }
-		);
+		const user = await User.findOne({
+			where: usernameOrEmail.includes('@') ? { email: usernameOrEmail } : { username: usernameOrEmail.toLowerCase() }
+		});
 		if (!user) {
 			return {
 				errors: [

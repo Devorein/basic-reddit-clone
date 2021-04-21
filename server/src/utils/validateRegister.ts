@@ -18,14 +18,12 @@ export const validateRegister = (input: UserDataInput) => {
 		];
 
 	if (input.username.length <= 4)
-		return {
-			errors: [
-				{
-					field: 'username',
-					message: 'Username must be at least 5 characters long'
-				}
-			]
-		};
+		return [
+			{
+				field: 'username',
+				message: 'Username must be at least 5 characters long'
+			}
+		];
 
 	if (input.username.includes('@'))
 		return [

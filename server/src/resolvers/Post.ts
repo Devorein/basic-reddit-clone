@@ -1,32 +1,27 @@
-import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Int, Mutation, Query, Resolver } from 'type-graphql';
 import Post from '../entities/Post';
-import { Context } from '../types';
 
 @Resolver()
 export class PostResolver {
 	@Query(() => [ Post ])
-	async posts (@Ctx() ctx: Context) {
-		return ctx.em.find(Post, {});
+	async posts (): Promise<Post[]> {
+		return Post.find();
 	}
 
 	@Query(() => Post, { nullable: true })
 	post (
 		@Arg('id', () => Int)
-		id: number,
-		@Ctx() ctx: Context
-	) {
-		return ctx.em.findOne(Post, { id });
+		id: number
+	): Promise<Post | undefined> {
+		return Post.findOne(id);
 	}
 
 	@Mutation(() => Post)
 	async createPost (
 		@Arg('title', () => String)
-		title: string,
-		@Ctx() ctx: Context
-	) {
-		const post = ctx.em.create(Post, { title });
-		await ctx.em.persistAndFlush(post);
-		return post;
+		title: string
+	): Promise<Post> {
+		return Post.create({ title }).save();
 	}
 
 	@Mutation(() => Post, { nullable: true })
@@ -34,24 +29,22 @@ export class PostResolver {
 		@Arg('id', () => Int)
 		id: number,
 		@Arg('title', () => String)
-		title: string,
-		@Ctx() ctx: Context
+		title: string
 	) {
-		const post = await ctx.em.findOne(Post, { id });
+		const post = await Post.findOne(id);
 		if (!post) return null;
+		await Post.update({ id }, { title });
 		post.title = title;
-		await ctx.em.persistAndFlush(post);
 		return post;
 	}
 
 	@Mutation(() => Boolean)
 	async deletePost (
 		@Arg('id', () => Int)
-		id: number,
-		@Ctx() ctx: Context
+		id: number
 	) {
 		try {
-			await ctx.em.nativeDelete(Post, { id });
+			await Post.delete(id);
 			return true;
 		} catch (err) {
 			return false;
