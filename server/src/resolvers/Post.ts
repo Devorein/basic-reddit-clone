@@ -1,6 +1,8 @@
-import { Arg, Int, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { getConnection } from 'typeorm';
 import Post from '../entities/Post';
+import { Context } from '../types';
+import { PostInput } from '../types/Input/PostInput';
 
 @Resolver()
 export class PostResolver {
@@ -19,16 +21,16 @@ export class PostResolver {
 
 	@Mutation(() => Post)
 	async createPost (
-		@Arg('title', () => String)
-		title: string
+		@Arg('input', () => PostInput)
+		input: PostInput,
+		@Ctx() ctx: Context
 	): Promise<Post> {
+		if (!ctx.req.session.user_id) throw new Error('User not authenticated');
 		return (await getConnection()
 			.createQueryBuilder()
 			.insert()
 			.into(Post)
-			.values({
-				title
-			})
+			.values({ ...input, creatorId: ctx.req.session.user_id })
 			.returning('*')
 			.execute()).raw[0];
 	}
@@ -39,7 +41,7 @@ export class PostResolver {
 		id: number,
 		@Arg('title', () => String)
 		title: string
-	) {
+	): Promise<Post | null> {
 		const post = await Post.findOne(id);
 		if (!post) return null;
 		await Post.update({ id }, { title });
@@ -51,7 +53,7 @@ export class PostResolver {
 	async deletePost (
 		@Arg('id', () => Int)
 		id: number
-	) {
+	): Promise<boolean> {
 		try {
 			await Post.delete(id);
 			return true;

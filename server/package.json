@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc -w",
-    "start": "nodemon ./dist/index.js",
-    "create:mig": "npx mikro-orm migration:create"
+    "start": "nodemon ./dist/index.js"
   },
   "keywords": [],
   "author": "Safwan Shaheer <devorein00@gmail.com>",
