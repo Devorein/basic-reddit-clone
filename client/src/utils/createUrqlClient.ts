@@ -1,4 +1,4 @@
-import { cacheExchange } from '@urql/exchange-graphcache';
+import { cacheExchange, Resolver } from '@urql/exchange-graphcache';
 import Router from 'next/router';
 import { dedupExchange, Exchange, fetchExchange } from 'urql';
 import { pipe, tap } from 'wonka';
@@ -16,12 +16,34 @@ const errorExchange: Exchange = ({forward}) => (ops$) => {
   )
 }
 
+const cursorPagination = (): Resolver => {
+  return (_parent, fieldArgs, cache, info) => {
+    const {parentKey: entityKey, fieldName} = info;
+    const allFields = cache.inspectFields(entityKey);
+    const fieldInfos = allFields.filter(field=>field.fieldName === fieldName);
+    const size = fieldInfos.length;
+    if(size === 0)
+      return undefined;
+    const dataIds: Set<string> = new Set();
+    fieldInfos.forEach(fieldInfo=>{
+      (cache.resolve(entityKey, fieldInfo.fieldKey) as string[]).forEach(dataId=>dataIds.add(dataId));
+    });
+
+    return Array.from(dataIds);
+  };
+};
+
 export const createUrqlClient = (ssrExchange: any) => ({
 	url: 'http://localhost:5000/graphql',
 	fetchOptions: { credentials: 'include' as const },
 	exchanges: [
 		dedupExchange,
 		cacheExchange({
+      resolvers: {
+        Query: {
+          posts: cursorPagination()
+        },
+      },
 			updates: {
 				Mutation: {
 					logout: (result, _, cache, __) => {
