@@ -4,6 +4,7 @@ import Post from '../entities/Post';
 import { isAuth } from '../middleware/isAuth';
 import { Context } from '../types';
 import { PostInput } from '../types/Input/PostInput';
+import { PaginatedPosts } from '../types/Object/PaginatedPosts';
 
 @Resolver(Post)
 export class PostResolver {
@@ -12,21 +13,22 @@ export class PostResolver {
     return root.text.split(".").slice(0, lines ?? 1).join(".")+".";
   }
 
-	@Query(() => [ Post ])
+	@Query(() => PaginatedPosts)
 	async posts (
 		@Arg('limit', () => Int)
 		limit: number,
 		@Arg('cursor', () => String, { nullable: true })
 		cursor: string | null
-	): Promise<Post[]> {
+	): Promise<PaginatedPosts> {
 		const realLimit = Math.min(50, limit);
 		const qb = getConnection()
 			.getRepository(Post)
 			.createQueryBuilder('p')
 			.orderBy('"createdAt"', 'DESC')
-			.take(realLimit);
+			.take(realLimit+1);
 		if (cursor) qb.where('"createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) });
-		return qb.getMany();
+		const posts = await qb.getMany();
+    return {posts: posts.slice(0, realLimit), hasMore: posts.length === realLimit + 1};
 	}
 
 	@Query(() => Post, { nullable: true })
