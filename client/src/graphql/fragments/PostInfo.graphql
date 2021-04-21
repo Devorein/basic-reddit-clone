@@ -1,0 +1,9 @@
+fragment PostInfo on Post{
+  id
+  text
+  title
+  creatorId
+  points
+  createdAt
+  updatedAt
+}
