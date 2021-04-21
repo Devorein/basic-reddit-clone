@@ -1,0 +1,6 @@
+fragment PaginatedPostsInfo on PaginatedPosts{
+  posts{
+    ...PostInfo
+  }
+  hasMore
+}
