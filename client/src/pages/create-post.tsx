@@ -13,7 +13,7 @@ const CreatePost = () => {
   const { meData, fetching } = useIsAuth();
 
   const [, createPost] = useCreatePostMutation();
-  return meData && fetching ? <Layout><Formik initialValues={{ text: '', title: '' }} onSubmit={async (values) => {
+  return meData && !fetching ? <Layout><Formik initialValues={{ text: '', title: '' }} onSubmit={async (values) => {
     const response = await createPost({ input: values })
     if (!response.error)
       router.push("/");

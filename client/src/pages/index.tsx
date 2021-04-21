@@ -9,7 +9,6 @@ import { createUrqlClient } from "../utils/createUrqlClient";
 const Index = () => {
   const [{ data }] = usePostsQuery();
   const [{ data: meData, fetching }] = useMeQuery();
-  console.log(meData)
   return (
     <Layout>
       {!fetching && meData?.me && <NextLinK href="/create-post"><Button bg="tomato" m={5}>Create Post</Button></NextLinK>}
