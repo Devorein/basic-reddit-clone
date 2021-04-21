@@ -25,6 +25,7 @@ export default class Post extends BaseEntity{
   @Column({type: 'int', default: 0})
   points: number
 
+  @Field(()=> User)
   @ManyToOne(()=> User, user=>user.posts)
   creator: User;
   

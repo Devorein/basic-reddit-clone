@@ -9,7 +9,8 @@ import { UserDataInput } from '../types/Input/UserDataInput';
 import { UserResponse } from '../types/Object/UserResponse';
 import { sendEmail } from '../utils/sendEmail';
 import { validateRegister } from '../utils/validateRegister';
-@Resolver()
+
+@Resolver(User)
 export class UserResolver {
 	@Query(() => User, { nullable: true })
 	me (@Ctx() { req }: Context): null | Promise<User | undefined> {

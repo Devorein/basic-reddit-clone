@@ -1,10 +1,12 @@
-import { Arg, Ctx, FieldResolver, Int, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
+import { GraphQLResolveInfo } from "graphql";
+import { Arg, Ctx, FieldResolver, Info, Int, Mutation, Query, Resolver, Root, UseMiddleware } from 'type-graphql';
 import { getConnection } from 'typeorm';
 import Post from '../entities/Post';
 import { isAuth } from '../middleware/isAuth';
 import { Context } from '../types';
 import { PostInput } from '../types/Input/PostInput';
 import { PaginatedPosts } from '../types/Object/PaginatedPosts';
+import { checkForObjectSelection } from '../utils/checkForObjectSelection';
 
 @Resolver(Post)
 export class PostResolver {
@@ -18,15 +20,20 @@ export class PostResolver {
 		@Arg('limit', () => Int)
 		limit: number,
 		@Arg('cursor', () => String, { nullable: true })
-		cursor: string | null
+		cursor: string | null,
+    @Info() info: GraphQLResolveInfo
 	): Promise<PaginatedPosts> {
+    const containsCreatorSelection = checkForObjectSelection(info, ['posts','posts','creator']);
 		const realLimit = Math.min(50, limit);
 		const qb = getConnection()
-			.getRepository(Post)
-			.createQueryBuilder('p')
-			.orderBy('"createdAt"', 'DESC')
-			.take(realLimit+1);
-		if (cursor) qb.where('"createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) });
+      .getRepository(Post)
+      .createQueryBuilder('p');
+    if(containsCreatorSelection)
+      qb.innerJoinAndSelect("p.creator", "c", 'c.id = p."creatorId"')	
+			
+    qb.orderBy('p."createdAt"', 'DESC')
+			.limit(realLimit+1);
+		if (cursor) qb.where('p."createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) });
 		const posts = await qb.getMany();
     return {posts: posts.slice(0, realLimit), hasMore: posts.length === realLimit + 1};
 	}
