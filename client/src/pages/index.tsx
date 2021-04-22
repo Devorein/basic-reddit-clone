@@ -15,7 +15,6 @@ const Index = () => {
   const [{ data: postsData, fetching: fetchingPosts }] = usePostsQuery({
     variables: postQueryVariables
   });
-  console.log({ fetchingPosts, postsData })
   const [{ data: meData, fetching }] = useMeQuery();
   return (
     <Layout>
@@ -23,6 +22,7 @@ const Index = () => {
       {fetchingPosts ? <div>Loading ...</div> : postsData && <Stack spacing={5}> {postsData.posts.posts.map(post =>
         <Box key={post.id} p={5} shadow="md" borderWidth="1px">
           <Heading fontSize="xl">{post.title}</Heading>
+          <Heading fontSize="sm">by {post.creator.username}</Heading>
           <Text mt={4}>{post.textSnippet}</Text>
         </Box>)}
       </Stack>}

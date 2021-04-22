@@ -6,4 +6,7 @@ fragment PostInfo on Post{
   points
   createdAt
   updatedAt
+  creator{
+    ...UserInfo
+  }
 }

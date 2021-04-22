@@ -43,7 +43,7 @@ export class PostResolver {
 		cursor: string | null,
     @Info() info: GraphQLResolveInfo
 	): Promise<PaginatedPosts> {
-    const containsCreatorSelection = checkForObjectSelection(info, ['posts','posts','creator']);
+    const containsCreatorSelection = checkForObjectSelection(info, ['posts', 'posts','creator']);
 		const realLimit = Math.min(50, limit);
 		const qb = getConnection()
       .getRepository(Post)

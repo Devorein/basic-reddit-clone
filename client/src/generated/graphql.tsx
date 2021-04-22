@@ -22,6 +22,7 @@ export type FieldError = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  upvote: Scalars['Boolean'];
   createPost: Post;
   updatePost?: Maybe<Post>;
   deletePost: Scalars['Boolean'];
@@ -30,6 +31,12 @@ export type Mutation = {
   register: UserResponse;
   login: UserResponse;
   logout: Scalars['Boolean'];
+};
+
+
+export type MutationUpvoteArgs = {
+  amount: Scalars['Int'];
+  postId: Scalars['Int'];
 };
 
 
@@ -83,6 +90,8 @@ export type Post = {
   title: Scalars['String'];
   text: Scalars['String'];
   points: Scalars['Int'];
+  creator: User;
+  upvotes: Array<Upvote>;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
   textSnippet: Scalars['String'];
@@ -116,11 +125,22 @@ export type QueryPostArgs = {
   id: Scalars['Int'];
 };
 
+export type Upvote = {
+  __typename?: 'Upvote';
+  value: Scalars['Float'];
+  userId: Scalars['Float'];
+  user: User;
+  postId: Scalars['Float'];
+  post: Post;
+};
+
 export type User = {
   __typename?: 'User';
   id: Scalars['Int'];
   username: Scalars['String'];
   email: Scalars['String'];
+  posts: Array<Post>;
+  upvotes: Array<Upvote>;
   createdAt: Scalars['String'];
   updatedAt: Scalars['String'];
 };
@@ -154,6 +174,10 @@ export type PaginatedPostsInfoFragment = (
 export type PostInfoFragment = (
   { __typename?: 'Post' }
   & Pick<Post, 'id' | 'textSnippet' | 'title' | 'creatorId' | 'points' | 'createdAt' | 'updatedAt'>
+  & { creator: (
+    { __typename?: 'User' }
+    & UserInfoFragment
+  ) }
 );
 
 export type UserInfoFragment = (
@@ -271,6 +295,12 @@ export type PostsQuery = (
   ) }
 );
 
+export const UserInfoFragmentDoc = gql`
+    fragment UserInfo on User {
+  id
+  username
+}
+    `;
 export const PostInfoFragmentDoc = gql`
     fragment PostInfo on Post {
   id
@@ -280,8 +310,11 @@ export const PostInfoFragmentDoc = gql`
   points
   createdAt
   updatedAt
+  creator {
+    ...UserInfo
+  }
 }
-    `;
+    ${UserInfoFragmentDoc}`;
 export const PaginatedPostsInfoFragmentDoc = gql`
     fragment PaginatedPostsInfo on PaginatedPosts {
   posts {
@@ -290,12 +323,6 @@ export const PaginatedPostsInfoFragmentDoc = gql`
   hasMore
 }
     ${PostInfoFragmentDoc}`;
-export const UserInfoFragmentDoc = gql`
-    fragment UserInfo on User {
-  id
-  username
-}
-    `;
 export const FieldErrorInfoFragmentDoc = gql`
     fragment FieldErrorInfo on FieldError {
   field
