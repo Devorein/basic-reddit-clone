@@ -16,7 +16,7 @@ export default function VoteSection({ post }: Props) {
         setLoadingState('upvote-loading');
         await vote({
           postId: post.id,
-          value: post.points === 1 ? 0 : 1
+          value: 1
         })
         setLoadingState('not-loading');
       }} isLoading={loadingState !== 'not-loading'} aria-label="Up Vote post" bg="red.500" size="sm">
@@ -27,7 +27,7 @@ export default function VoteSection({ post }: Props) {
         setLoadingState('downvote-loading');
         await vote({
           postId: post.id,
-          value: post.points === -1 ? 0 : -1
+          value: -1
         })
         setLoadingState('not-loading');
       }} isLoading={loadingState !== 'not-loading'} aria-label="Down Vote post" bg="red.500" size="sm">
