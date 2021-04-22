@@ -9,7 +9,6 @@ interface Props {
 
 export default function VoteSection({ post }: Props) {
   const [loadingState, setLoadingState] = useState<'upvote-loading' | 'not-loading' | 'downvote-loading'>('not-loading');
-  console.log(loadingState);
   const [, vote] = useVoteMutation();
   return (
     <Flex p={5} shadow="md" borderWidth="1px" direction="column" justifyContent="center" alignItems="center">
@@ -17,7 +16,7 @@ export default function VoteSection({ post }: Props) {
         setLoadingState('upvote-loading');
         await vote({
           postId: post.id,
-          value: 1
+          value: post.points === 1 ? 0 : 1
         })
         setLoadingState('not-loading');
       }} isLoading={loadingState !== 'not-loading'} aria-label="Up Vote post" bg="red.500" size="sm">
@@ -28,7 +27,7 @@ export default function VoteSection({ post }: Props) {
         setLoadingState('downvote-loading');
         await vote({
           postId: post.id,
-          value: -1
+          value: post.points === -1 ? 0 : -1
         })
         setLoadingState('not-loading');
       }} isLoading={loadingState !== 'not-loading'} aria-label="Down Vote post" bg="red.500" size="sm">
