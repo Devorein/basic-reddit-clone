@@ -19,6 +19,7 @@ import { Context } from '../types';
 import { PostInput } from '../types/Input/PostInput';
 import { PaginatedPosts } from '../types/Object/PaginatedPosts';
 import { checkForObjectSelection } from '../utils/checkForObjectSelection';
+import { rawToObject } from '../utils/rawToObject';
 
 @Resolver(Post)
 export class PostResolver {
@@ -88,17 +89,31 @@ export class PostResolver {
 		limit: number,
 		@Arg('cursor', () => String, { nullable: true })
 		cursor: string | null,
-		@Info() info: GraphQLResolveInfo
+		@Info() info: GraphQLResolveInfo,
+		@Ctx() { req }: Context
 	): Promise<PaginatedPosts> {
 		const containsCreatorSelection = checkForObjectSelection(info, ['posts', 'posts', 'creator']);
 		const realLimit = Math.min(50, limit);
 		const qb = getConnection().getRepository(Post).createQueryBuilder('p');
 		if (containsCreatorSelection) qb.innerJoinAndSelect('p.creator', 'c', 'c.id = p."creatorId"');
+		const subQuery = getConnection()
+			.createQueryBuilder()
+			.select('value')
+			.from(Upvote, 'u')
+			.where(`u."userId" = ${req.session.user_id} and u."postId" = p.id`)
+			.getQuery();
+
+		qb.addSelect(`(${subQuery})`, 'voteStatus');
 
 		qb.orderBy('p."createdAt"', 'DESC').limit(realLimit + 1);
 		if (cursor) qb.where('p."createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) });
-		const posts = await qb.getMany();
-		return { posts: posts.slice(0, realLimit), hasMore: posts.length === realLimit + 1 };
+		const posts = await qb.getRawMany();
+		return {
+			posts: posts
+				.map((post) => rawToObject<Post>(post, 'p', { c: 'creator' }))
+				.slice(0, realLimit),
+			hasMore: posts.length === realLimit + 1,
+		};
 	}
 
 	@Query(() => Post, { nullable: true })

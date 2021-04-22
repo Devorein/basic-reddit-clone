@@ -1,0 +1,4 @@
+SELECT "p"."id" AS "p_id", "p"."creatorId" AS "p_creatorId", "p"."title" AS "p_title", "p"."text" AS "p_text", "p"."points" AS "p_points", "p"."createdAt" AS "p_createdAt", "p"."updatedAt" AS "p_updatedAt", 
+"c"."id" AS "c_id", "c"."username" AS "c_username", "c"."email" AS "c_email", "c"."password" AS "c_password", "c"."createdAt" AS "c_createdAt", "c"."updatedAt" AS "c_updatedAt", 
+  (SELECT value FROM "upvote" "u" WHERE u."userId" = 4 and u."postId" = "p"."id") AS "voteStatus" 
+  FROM "post" "p" INNER JOIN "user" "c" ON "c"."id"="p"."creatorId" AND ("c"."id" = p."creatorId") ORDER BY p."createdAt" DESC LIMIT 2
