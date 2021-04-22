@@ -100,10 +100,10 @@ export class PostResolver {
 			.createQueryBuilder()
 			.select('value')
 			.from(Upvote, 'u')
-			.where(`u."userId" = ${req.session.user_id} and u."postId" = p.id`)
+			.where(`u."userId" = ${req.session.user_id}  and u."postId" = p.id`)
 			.getQuery();
 
-		qb.addSelect(`(${subQuery})`, 'voteStatus');
+		req.session.user_id && qb.addSelect(`(${subQuery})`, 'voteStatus');
 
 		qb.orderBy('p."createdAt"', 'DESC').limit(realLimit + 1);
 		if (cursor) qb.where('p."createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) });

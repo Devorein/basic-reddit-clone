@@ -1,9 +1,10 @@
-fragment PostInfo on Post{
-  id
-  textSnippet(lines: $lines)
-  title
-  creatorId
-  points
-  createdAt
-  updatedAt
+fragment PostInfo on Post {
+	id
+	textSnippet(lines: $lines)
+	title
+	creatorId
+	points
+	createdAt
+	updatedAt
+	voteStatus
 }

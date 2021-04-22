@@ -1,12 +1,6 @@
-fragment PostDetails on Post{
-  id
-  textSnippet(lines: $lines)
-  title
-  creatorId
-  points
-  createdAt
-  updatedAt
-  creator{
-    ...UserInfo
-  }
+fragment PostDetails on Post {
+	...PostInfo
+	creator {
+		...UserInfo
+	}
 }

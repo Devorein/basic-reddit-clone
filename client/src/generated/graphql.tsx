@@ -88,6 +88,7 @@ export type Post = {
   id: Scalars['Int'];
   creatorId: Scalars['Float'];
   title: Scalars['String'];
+  voteStatus?: Maybe<Scalars['Int']>;
   text: Scalars['String'];
   points: Scalars['Int'];
   creator: User;
@@ -173,16 +174,16 @@ export type PaginatedPostsInfoFragment = (
 
 export type PostDetailsFragment = (
   { __typename?: 'Post' }
-  & Pick<Post, 'id' | 'textSnippet' | 'title' | 'creatorId' | 'points' | 'createdAt' | 'updatedAt'>
   & { creator: (
     { __typename?: 'User' }
     & UserInfoFragment
   ) }
+  & PostInfoFragment
 );
 
 export type PostInfoFragment = (
   { __typename?: 'Post' }
-  & Pick<Post, 'id' | 'textSnippet' | 'title' | 'creatorId' | 'points' | 'createdAt' | 'updatedAt'>
+  & Pick<Post, 'id' | 'textSnippet' | 'title' | 'creatorId' | 'points' | 'createdAt' | 'updatedAt' | 'voteStatus'>
 );
 
 export type UserInfoFragment = (
@@ -325,6 +326,18 @@ export type PostsQuery = (
   ) }
 );
 
+export const PostInfoFragmentDoc = gql`
+    fragment PostInfo on Post {
+  id
+  textSnippet(lines: $lines)
+  title
+  creatorId
+  points
+  createdAt
+  updatedAt
+  voteStatus
+}
+    `;
 export const UserInfoFragmentDoc = gql`
     fragment UserInfo on User {
   id
@@ -335,18 +348,13 @@ export const UserInfoFragmentDoc = gql`
     `;
 export const PostDetailsFragmentDoc = gql`
     fragment PostDetails on Post {
-  id
-  textSnippet(lines: $lines)
-  title
-  creatorId
-  points
-  createdAt
-  updatedAt
+  ...PostInfo
   creator {
     ...UserInfo
   }
 }
-    ${UserInfoFragmentDoc}`;
+    ${PostInfoFragmentDoc}
+${UserInfoFragmentDoc}`;
 export const PaginatedPostsInfoFragmentDoc = gql`
     fragment PaginatedPostsInfo on PaginatedPosts {
   posts {
@@ -355,17 +363,6 @@ export const PaginatedPostsInfoFragmentDoc = gql`
   hasMore
 }
     ${PostDetailsFragmentDoc}`;
-export const PostInfoFragmentDoc = gql`
-    fragment PostInfo on Post {
-  id
-  textSnippet(lines: $lines)
-  title
-  creatorId
-  points
-  createdAt
-  updatedAt
-}
-    `;
 export const FieldErrorInfoFragmentDoc = gql`
     fragment FieldErrorInfo on FieldError {
   field

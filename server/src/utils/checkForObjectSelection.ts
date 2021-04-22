@@ -1,23 +1,31 @@
-import { FragmentDefinitionNode, GraphQLResolveInfo, SelectionNode } from 'graphql';
+import { FieldNode, GraphQLResolveInfo, SelectionSetNode } from 'graphql';
 
 export const checkForObjectSelection = (info: GraphQLResolveInfo, fields: string[]) => {
-	let parent = info.operation.selectionSet;
-	for (let index = 0; index < fields.length; index++) {
-		const field = fields[index];
-		let selectionNode: SelectionNode | FragmentDefinitionNode | null = null;
-		for (let _index = 0; _index < parent.selections.length; _index++) {
-			const selection = parent.selections[_index];
+	function inner(
+		parent: { selectionSet: SelectionSetNode },
+		field: string
+	): { selectionSet: SelectionSetNode } | null {
+		let selectionNode: FieldNode | null = null;
+		const selections = parent.selectionSet.selections;
+		for (let index = 0; index < selections.length; index++) {
+			const selection = selections[index];
 			if (selection.kind === 'Field' && selection.name.value === field) {
 				selectionNode = selection;
 				break;
 			} else if (selection.kind === 'FragmentSpread' && info.fragments[selection.name.value]) {
-				selectionNode = info.fragments[selection.name.value];
-				index--;
-				break;
+				selectionNode = inner(info.fragments[selection.name.value], field) as FieldNode;
+				if (selectionNode) break;
 			}
 		}
-		if (selectionNode && 'selectionSet' in selectionNode) parent = selectionNode.selectionSet!;
-		else return false;
+		if (selectionNode && 'selectionSet' in selectionNode)
+			return selectionNode as Required<FieldNode>;
+		else return null;
 	}
-	return true;
+
+	let parent: { selectionSet: SelectionSetNode } | null = info.operation;
+	for (let index = 0; index < fields.length; index++) {
+		if (parent) parent = inner(parent, fields[index]);
+		else break;
+	}
+	return Boolean(parent);
 };
