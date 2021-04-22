@@ -16,8 +16,8 @@ export class PostResolver {
   }
 
   @Mutation(()=>Boolean)
-  async upvote(@Arg('postId', ()=> Int) postId: number, @Arg('amount', ()=> Int) amount: number, @Ctx() ctx: Context){
-    const point = amount < 0 ? -1  : amount > 0 ? 1 : 0;
+  async vote(@Arg('postId', ()=> Int) postId: number, @Arg('value', ()=> Int) value: number, @Ctx() ctx: Context){
+    const point = value < 0 ? -1  : value > 0 ? 1 : 0;
     const user_id = ctx.req.session.user_id;
     await getConnection().query(`
       START TRANSACTION;
