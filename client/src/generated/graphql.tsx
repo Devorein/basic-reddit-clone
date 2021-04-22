@@ -167,11 +167,11 @@ export type PaginatedPostsInfoFragment = (
   & Pick<PaginatedPosts, 'hasMore'>
   & { posts: Array<(
     { __typename?: 'Post' }
-    & PostInfoFragment
+    & PostDetailsFragment
   )> }
 );
 
-export type PostInfoFragment = (
+export type PostDetailsFragment = (
   { __typename?: 'Post' }
   & Pick<Post, 'id' | 'textSnippet' | 'title' | 'creatorId' | 'points' | 'createdAt' | 'updatedAt'>
   & { creator: (
@@ -180,9 +180,14 @@ export type PostInfoFragment = (
   ) }
 );
 
+export type PostInfoFragment = (
+  { __typename?: 'Post' }
+  & Pick<Post, 'id' | 'textSnippet' | 'title' | 'creatorId' | 'points' | 'createdAt' | 'updatedAt'>
+);
+
 export type UserInfoFragment = (
   { __typename?: 'User' }
-  & Pick<User, 'id' | 'username'>
+  & Pick<User, 'id' | 'username' | 'createdAt' | 'updatedAt'>
 );
 
 export type UserResponseInfoFragment = (
@@ -299,10 +304,12 @@ export const UserInfoFragmentDoc = gql`
     fragment UserInfo on User {
   id
   username
+  createdAt
+  updatedAt
 }
     `;
-export const PostInfoFragmentDoc = gql`
-    fragment PostInfo on Post {
+export const PostDetailsFragmentDoc = gql`
+    fragment PostDetails on Post {
   id
   textSnippet(lines: $lines)
   title
@@ -318,11 +325,22 @@ export const PostInfoFragmentDoc = gql`
 export const PaginatedPostsInfoFragmentDoc = gql`
     fragment PaginatedPostsInfo on PaginatedPosts {
   posts {
-    ...PostInfo
+    ...PostDetails
   }
   hasMore
 }
-    ${PostInfoFragmentDoc}`;
+    ${PostDetailsFragmentDoc}`;
+export const PostInfoFragmentDoc = gql`
+    fragment PostInfo on Post {
+  id
+  textSnippet(lines: $lines)
+  title
+  creatorId
+  points
+  createdAt
+  updatedAt
+}
+    `;
 export const FieldErrorInfoFragmentDoc = gql`
     fragment FieldErrorInfo on FieldError {
   field

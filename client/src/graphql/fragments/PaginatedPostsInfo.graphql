@@ -1,6 +1,6 @@
 fragment PaginatedPostsInfo on PaginatedPosts{
   posts{
-    ...PostInfo
+    ...PostDetails
   }
   hasMore
 }

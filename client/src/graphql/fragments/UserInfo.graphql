@@ -1,4 +1,6 @@
 fragment UserInfo on User{
   id
   username
+  createdAt
+  updatedAt
 }
