@@ -1,15 +1,15 @@
 import { GraphQLResolveInfo } from 'graphql';
 import {
-	Arg,
-	Ctx,
-	FieldResolver,
-	Info,
-	Int,
-	Mutation,
-	Query,
-	Resolver,
-	Root,
-	UseMiddleware,
+  Arg,
+  Ctx,
+  FieldResolver,
+  Info,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+  Root,
+  UseMiddleware
 } from 'type-graphql';
 import { getConnection } from 'typeorm';
 import Post from '../entities/Post';
@@ -121,7 +121,7 @@ export class PostResolver {
 		@Arg('id', () => Int)
 		id: number
 	): Promise<Post | undefined> {
-		return Post.findOne(id);
+		return Post.findOne(id, {relations: ['creator']});
 	}
 
 	@Mutation(() => Post)

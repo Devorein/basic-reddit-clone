@@ -1,6 +1,6 @@
-import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, Link, Stack, Text } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
-import NextLinK from "next/link";
+import NextLink from "next/link";
 import React, { useState } from "react";
 import Layout from "../components/Layout";
 import VoteSection from '../components/VoteSection';
@@ -19,12 +19,16 @@ const Index = () => {
   const [{ data: meData, fetching }] = useMeQuery();
   return (
     <Layout>
-      {!fetching && meData?.me && <NextLinK href="/create-post"><Button bg="tomato" m={5}>Create Post</Button></NextLinK>}
+      {!fetching && meData?.me && <NextLink href="/create-post"><Button bg="tomato" m={5}>Create Post</Button></NextLink>}
       {fetchingPosts ? <div>Loading ...</div> : postsData && <Stack spacing={5}> {postsData.posts.posts.map(post =>
         <Flex key={post.id} >
           <VoteSection post={post} />
           <Box flex="1" p={5} shadow="md" borderWidth="1px">
-            <Heading fontSize="xl">{post.title}</Heading>
+            <NextLink href="/post/[id]" as={`/post/${post.id}`}>
+              <Link>
+                <Heading fontSize="xl">{post.title}</Heading>
+              </Link>
+            </NextLink>
             <Heading fontSize="sm">by {post.creator.username}</Heading>
             <Text mt={4}>{post.textSnippet}</Text>
           </Box>
