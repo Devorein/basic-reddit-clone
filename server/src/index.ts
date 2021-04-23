@@ -14,9 +14,10 @@ import Upvote from './entities/Upvote';
 import User from './entities/User';
 import { PostResolver } from './resolvers/Post';
 import { UserResolver } from './resolvers/User';
+import { createUpvoteLoader } from './utils/createUpvoteLoader';
 import { createUserLoader } from './utils/createUserLoader';
 
-async function main () {
+async function main() {
 	const conn = await createConnection({
 		type: 'postgres',
 		database: 'lireddit2',
@@ -24,8 +25,8 @@ async function main () {
 		password: 'root',
 		logging: true,
 		synchronize: true,
-		migrations: [ path.join(__dirname, '/migrations/*') ],
-		entities: [ User, Post, Upvote ]
+		migrations: [path.join(__dirname, '/migrations/*')],
+		entities: [User, Post, Upvote],
 	});
 
 	await conn.runMigrations();
@@ -37,7 +38,7 @@ async function main () {
 	app.use(
 		cors({
 			origin: 'http://localhost:3000',
-			credentials: true
+			credentials: true,
 		})
 	);
 	app.use(
@@ -48,25 +49,26 @@ async function main () {
 				maxAge: 1000 * 60 * 60 * 24 * 30, // a month
 				httpOnly: true,
 				secure: __PROD__,
-				sameSite: 'lax'
+				sameSite: 'lax',
 			},
 			saveUninitialized: false,
 			secret: 'redis_secret',
-			resave: false
+			resave: false,
 		})
 	);
 
 	const apolloServer = new ApolloServer({
 		schema: await buildSchema({
-			resolvers: [ PostResolver, UserResolver ],
-			validate: false
+			resolvers: [PostResolver, UserResolver],
+			validate: false,
 		}),
 		context: ({ req, res }) => ({
 			req,
 			res,
 			redis,
-      userLoader: createUserLoader()
-		})
+			userLoader: createUserLoader(),
+			upvoteLoader: createUpvoteLoader(),
+		}),
 	});
 	apolloServer.applyMiddleware({ app, cors: false });
 	app.listen(5000, () => {

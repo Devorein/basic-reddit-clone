@@ -35,8 +35,18 @@ export class PostResolver {
 	}
 
 	@FieldResolver(() => User)
-	creator(@Root() root: Post, @Ctx() { userLoader }: Context) {
+	creator(@Root() root: Post, @Ctx() { userLoader }: Context): Promise<User> {
 		return userLoader.load(root.creatorId);
+	}
+
+	@FieldResolver(() => Int, { nullable: true })
+	async voteStatus(
+		@Root() root: Post,
+		@Ctx() { upvoteLoader, req }: Context
+	): Promise<number | null | undefined> {
+		if (!req.session.user_id) return null;
+		const upvote = await upvoteLoader.load({ postId: root.id, userId: req.session.user_id });
+		return upvote?.value ? upvote.value : null;
 	}
 
 	@Mutation(() => Boolean)
