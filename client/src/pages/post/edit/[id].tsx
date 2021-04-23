@@ -1,28 +1,19 @@
 import { Button, Center, Spinner } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
-import { useRouter } from 'next/router';
 import React from 'react';
 import InputField from '../../../components/InputField';
 import Layout from '../../../components/Layout';
-import { usePostQuery, useUpdatePostMutation } from '../../../generated/graphql';
-import { useIsAuth } from '../../../hooks/useIsAuth';
+import { useUpdatePostMutation } from '../../../generated/graphql';
+import { usePostById } from '../../../hooks/usePostById';
 import { createUrqlClient } from '../../../utils/createUrqlClient';
 
 const EditPost = () => {
-  const router = useRouter();
-  const { meData, fetching } = useIsAuth();
-  const id = parseInt(router.query.id as string);
-
+  const { router, intId, meData, meFetching, postData, postFetching } = usePostById();
   const [, updatePost] = useUpdatePostMutation();
-  const [{ data: postData, fetching: postFetching }] = usePostQuery({
-    variables: {
-      id
-    }
-  })
 
-  return meData && !fetching && postData?.post && !postFetching ? <Layout><Formik initialValues={{ text: postData.post.text, title: postData.post.title }} onSubmit={async (values) => {
-    const response = await updatePost({ id, input: values })
+  return meData && !meFetching && postData && !postFetching ? <Layout><Formik initialValues={{ text: postData.text, title: postData.title }} onSubmit={async (values) => {
+    const response = await updatePost({ id: intId, input: values })
     if (!response.error)
       router.push("/");
   }}>
