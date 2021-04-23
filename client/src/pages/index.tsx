@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import Layout from "../components/Layout";
 import { MutatePostButtons } from "../components/MutatePostButtons";
 import VoteSection from '../components/VoteSection';
-import { PostsQueryVariables, useMeQuery, usePostsQuery } from "../generated/graphql";
+import { PostsQueryVariables, usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = () => {
@@ -13,7 +13,6 @@ const Index = () => {
     limit: 10,
     cursor: null
   });
-  const [{ data: meData }] = useMeQuery();
 
   const [{ data: postsData, fetching: fetchingPosts }] = usePostsQuery({
     variables: postQueryVariables
@@ -32,7 +31,7 @@ const Index = () => {
             <Heading fontSize="sm">by {post.creator.username}</Heading>
             <Text mt={4}>{post.textSnippet}</Text>
           </Box>
-          {meData?.me && post.creatorId === meData.me.id && <MutatePostButtons id={post.id} />}
+          <MutatePostButtons id={post.id} creatorId={post.creatorId} />
         </Flex>
       )}
       </Stack>}

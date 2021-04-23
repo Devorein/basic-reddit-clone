@@ -2,6 +2,7 @@ import { Heading, Text } from "@chakra-ui/react";
 import { withUrqlClient } from 'next-urql';
 import React from 'react';
 import Layout from '../../components/Layout';
+import { MutatePostButtons } from "../../components/MutatePostButtons";
 import { usePostById } from "../../hooks/usePostById";
 import { createUrqlClient } from '../../utils/createUrqlClient';
 
@@ -20,6 +21,7 @@ const Post = () => {
     comp = <>
       <Heading mb={5}>{postData.title}</Heading>
       <Text>{postData.text}</Text>
+      <MutatePostButtons direction="row" creatorId={postData.creatorId} id={postData.id} />
     </>
 
   return <Layout>

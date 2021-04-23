@@ -1,9 +1,7 @@
-import { GraphQLResolveInfo } from 'graphql';
 import {
 	Arg,
 	Ctx,
 	FieldResolver,
-	Info,
 	Int,
 	Mutation,
 	Query,
@@ -14,13 +12,12 @@ import {
 import { getConnection } from 'typeorm';
 import Post from '../entities/Post';
 import Upvote from '../entities/Upvote';
+import User from '../entities/User';
 import { isAuth } from '../middleware/isAuth';
 import { Context } from '../types';
 import { PostInput } from '../types/Input/PostInput';
 import { PostUpdateInput } from '../types/Input/PostUpdateInput';
 import { PaginatedPosts } from '../types/Object/PaginatedPosts';
-import { checkForObjectSelection } from '../utils/checkForObjectSelection';
-import { rawToObject } from '../utils/rawToObject';
 
 @Resolver(Post)
 export class PostResolver {
@@ -35,6 +32,11 @@ export class PostResolver {
 				.slice(0, lines ?? 1)
 				.join('.') + '.'
 		);
+	}
+
+	@FieldResolver(() => User)
+	creator(@Root() root: Post, @Ctx() { userLoader }: Context) {
+		return userLoader.load(root.creatorId);
 	}
 
 	@Mutation(() => Boolean)
@@ -90,13 +92,10 @@ export class PostResolver {
 		limit: number,
 		@Arg('cursor', () => String, { nullable: true })
 		cursor: string | null,
-		@Info() info: GraphQLResolveInfo,
 		@Ctx() { req }: Context
 	): Promise<PaginatedPosts> {
-		const containsCreatorSelection = checkForObjectSelection(info, ['posts', 'posts', 'creator']);
 		const realLimit = Math.min(50, limit);
 		const qb = getConnection().getRepository(Post).createQueryBuilder('p');
-		if (containsCreatorSelection) qb.innerJoinAndSelect('p.creator', 'c', 'c.id = p."creatorId"');
 		const subQuery = getConnection()
 			.createQueryBuilder()
 			.select('value')
@@ -108,11 +107,9 @@ export class PostResolver {
 
 		qb.orderBy('p."createdAt"', 'DESC').limit(realLimit + 1);
 		if (cursor) qb.where('p."createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) });
-		const posts = await qb.getRawMany();
+		const posts = await qb.getMany();
 		return {
-			posts: posts
-				.map((post) => rawToObject<Post>(post, 'p', { c: 'creator' }))
-				.slice(0, realLimit),
+			posts: posts.slice(0, realLimit),
 			hasMore: posts.length === realLimit + 1,
 		};
 	}

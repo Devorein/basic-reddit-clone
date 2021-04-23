@@ -14,6 +14,7 @@ import Upvote from './entities/Upvote';
 import User from './entities/User';
 import { PostResolver } from './resolvers/Post';
 import { UserResolver } from './resolvers/User';
+import { createUserLoader } from './utils/createUserLoader';
 
 async function main () {
 	const conn = await createConnection({
@@ -63,7 +64,8 @@ async function main () {
 		context: ({ req, res }) => ({
 			req,
 			res,
-			redis
+			redis,
+      userLoader: createUserLoader()
 		})
 	});
 	apolloServer.applyMiddleware({ app, cors: false });

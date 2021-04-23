@@ -16,7 +16,7 @@ const EditPost = () => {
   return meData && !meFetching && postData && !postFetching ? <Layout><Formik initialValues={{ text: postData.text, title: postData.title }} onSubmit={async (values) => {
     const response = await updatePost({ id: intId, input: values })
     if (!response.error)
-      router.push("/");
+      router.back();
   }}>
     {({ isSubmitting }) =>
       <Form>
