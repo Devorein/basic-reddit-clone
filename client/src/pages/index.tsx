@@ -21,7 +21,7 @@ const Index = () => {
   });
   return (
     <Layout>
-      {fetchingPosts ? <div>Loading ...</div> : postsData && <Stack spacing={5}> {postsData.posts.posts.map(post =>
+      {fetchingPosts ? <div>Loading ...</div> : postsData && <Stack spacing={5}> {postsData.posts.posts.map(post => !post ? null :
         <Flex key={post.id} >
           <VoteSection post={post} />
           <Box flex="1" p={5} shadow="md" borderWidth="1px">
