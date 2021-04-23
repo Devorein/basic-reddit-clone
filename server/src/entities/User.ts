@@ -1,39 +1,46 @@
-import { Field, Int, ObjectType } from "type-graphql";
-import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import Post from "./Post";
-import Upvote from "./Upvote";
+import { Field, Int, ObjectType } from 'type-graphql';
+import {
+	BaseEntity,
+	Column,
+	CreateDateColumn,
+	Entity,
+	OneToMany,
+	PrimaryGeneratedColumn,
+	UpdateDateColumn,
+} from 'typeorm';
+import Post from './Post';
+import Upvote from './Upvote';
 
 @Entity()
 @ObjectType()
-export default class User extends BaseEntity{
-  @Field(()=> Int)
-  @PrimaryGeneratedColumn()
-  id!: number;
-  
-  @Field(()=> String)
-  @Column({unique: true})
-  username!: string;
-  
-  @Field(()=> String)
-  @Column({unique: true})
-  email!: string;
+export default class User extends BaseEntity {
+	@Field(() => Int)
+	@PrimaryGeneratedColumn()
+	id!: number;
 
-  @Column()
-  password!: string;
+	@Field(() => String)
+	@Column({ unique: true })
+	username!: string;
 
-  @Field(()=> [Post])
-  @OneToMany(()=> Post, post=>post.creator)
-  posts: Post[]
-  
-  @Field(()=> [Upvote])
-  @OneToMany(()=> Upvote, upvote=>upvote.user)
-  upvotes: Upvote[]
+	@Field(() => String)
+	@Column({ unique: true })
+	email!: string;
 
-  @Field(()=> String)
-  @CreateDateColumn()
-  createdAt = Date;
+	@Column()
+	password!: string;
 
-  @Field(()=> String)
-  @UpdateDateColumn()
-  updatedAt = Date;
+	@Field(() => [Post])
+	@OneToMany(() => Post, (post) => post.creator)
+	posts: Post[];
+
+	@OneToMany(() => Upvote, (upvote) => upvote.user)
+	upvotes: Upvote[];
+
+	@Field(() => String)
+	@CreateDateColumn()
+	createdAt = Date;
+
+	@Field(() => String)
+	@UpdateDateColumn()
+	updatedAt = Date;
 }
