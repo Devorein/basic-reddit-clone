@@ -1,4 +1,4 @@
-import { cacheExchange, Resolver } from '@urql/exchange-graphcache';
+import { Cache, cacheExchange, Resolver } from '@urql/exchange-graphcache';
 import gql from 'graphql-tag';
 import Router from 'next/router';
 import { dedupExchange, Exchange, fetchExchange, stringifyVariables } from 'urql';
@@ -26,6 +26,14 @@ const errorExchange: Exchange = ({ forward }) => (ops$) => {
 			}
 		})
 	);
+};
+
+const invalidateAllPosts = (cache: Cache) => {
+	const allFields = cache.inspectFields('Query');
+	const fieldInfos = allFields.filter((info) => info.fieldName === 'posts');
+	fieldInfos.forEach((fieldInfo) => {
+		cache.invalidate('Query', 'posts', fieldInfo.arguments || {});
+	});
 };
 
 const cursorPagination = (): Resolver => {
@@ -117,11 +125,7 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
 							});
 						},
 						createPost: (_, __, cache, ___) => {
-							const allFields = cache.inspectFields('Query');
-							const fieldInfos = allFields.filter((info) => info.fieldName === 'posts');
-							fieldInfos.forEach((fieldInfo) => {
-								cache.invalidate('Query', 'posts', fieldInfo.arguments || {});
-							});
+							invalidateAllPosts(cache);
 						},
 						logout: (result, _, cache, __) => {
 							typedUpdateQuery<LogoutMutation, MeQuery>(
@@ -146,6 +150,7 @@ export const createUrqlClient = (ssrExchange: any, ctx: any) => {
 										};
 								}
 							);
+							invalidateAllPosts(cache);
 						},
 						register: (result, _, cache, __) => {
 							typedUpdateQuery<RegisterMutation, MeQuery>(
