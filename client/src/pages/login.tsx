@@ -28,8 +28,8 @@ const Login = () => {
           <InputField name="usernameOrEmail" placeholder="johndoe" label="Username Or Email" />
           <InputField name="password" placeholder="password" label="Password" type="password" />
           <Flex justifyContent="space-between">
-            <Button colorScheme="teal" m={5} isLoading={isSubmitting} type="submit">Login</Button>
-            <Button colorScheme="teal" m={5} onClick={() => router.push("/forgot-password")}>Forgot Password?</Button>
+            <Button colorScheme="orange" m={5} isLoading={isSubmitting} type="submit">Login</Button>
+            <Button colorScheme="orange" m={5} onClick={() => router.push("/forgot-password")}>Forgot Password?</Button>
           </Flex>
         </Form>
       }

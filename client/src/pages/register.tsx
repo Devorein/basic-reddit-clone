@@ -25,7 +25,7 @@ const Register = () => {
           <InputField name="username" placeholder="johndoe" label="Username" />
           <InputField name="email" placeholder="email" label="Email" />
           <InputField name="password" placeholder="password" label="Password" type="password" />
-          <Button colorScheme="teal" mt={5} isLoading={isSubmitting} type="submit">Register</Button>
+          <Button colorScheme="orange" mt={5} isLoading={isSubmitting} type="submit">Register</Button>
         </Form>
       }
     </Formik>

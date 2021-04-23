@@ -17,7 +17,7 @@ const ForgotPassword: React.FC<{}> = ({ }) => {
       {({ isSubmitting }) =>
         sentEmail ? <div>A link to change your password has been sent to your email</div> : <Form>
           <InputField name="email" placeholder="email" label="Email" />
-          <Button isLoading={isSubmitting} colorScheme="teal" m={5} type="submit">Forgot Password?</Button>
+          <Button isLoading={isSubmitting} colorScheme="orange" m={5} type="submit">Forgot Password?</Button>
         </Form>
       }
     </Formik>

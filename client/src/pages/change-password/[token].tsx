@@ -36,7 +36,7 @@ const ChangePassword: NextPage = () => {
             </NextLink>
           </Box>
         </Flex>}
-        <Button colorScheme="teal" mt={5} isLoading={isSubmitting} type="submit">Change Password</Button>
+        <Button colorScheme="orange" mt={5} isLoading={isSubmitting} type="submit">Change Password</Button>
       </Form>
     }
   </Formik>;
