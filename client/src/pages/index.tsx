@@ -4,7 +4,7 @@ import NextLink from "next/link";
 import React, { useState } from "react";
 import Layout from "../components/Layout";
 import VoteSection from '../components/VoteSection';
-import { PostsQueryVariables, useMeQuery, usePostsQuery } from "../generated/graphql";
+import { PostsQueryVariables, usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = () => {
@@ -16,10 +16,8 @@ const Index = () => {
   const [{ data: postsData, fetching: fetchingPosts }] = usePostsQuery({
     variables: postQueryVariables
   });
-  const [{ data: meData, fetching }] = useMeQuery();
   return (
     <Layout>
-      {!fetching && meData?.me && <NextLink href="/create-post"><Button bg="tomato" m={5}>Create Post</Button></NextLink>}
       {fetchingPosts ? <div>Loading ...</div> : postsData && <Stack spacing={5}> {postsData.posts.posts.map(post =>
         <Flex key={post.id} >
           <VoteSection post={post} />

@@ -4,20 +4,16 @@ import React from 'react';
 import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 import { isServer } from '../utils/isServer';
 
-interface NavbarProps {
-
-}
-
-const Navbar: React.FC<NavbarProps> = ({ }) => {
+const Navbar = () => {
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
-  const [{ data, fetching }] = useMeQuery({
+  const [{ data: meData, fetching: meFetching }] = useMeQuery({
     pause: isServer()
   });
   let body = null;
 
-  if (fetching) {
+  if (meFetching) {
 
-  } else if (!data?.me) {
+  } else if (!meData?.me) {
     body = <>
       <NextLink href="/register">
         <Link mr="4">Register</Link>
@@ -27,12 +23,13 @@ const Navbar: React.FC<NavbarProps> = ({ }) => {
       </NextLink>
     </>
   } else {
-    body = <Flex>
-      <Box mr="3" >{data.me.username}</Box>
+    body = <Flex align="center">
+      <NextLink href="/create-post"><Button bg="tomato" m={5}>Create Post</Button></NextLink>
+      <Box mr={5}>{meData.me.username}</Box>
       <Button isLoading={logoutFetching} onClick={() => logout()} variant="link">Logout</Button>
     </Flex>
   }
-  return (<Flex bg="tomato" p={4}>
+  return (<Flex bg="tomato" p={4} align="center">
     <NextLink href="/"><Link><Heading>Lireddit</Heading></Link></NextLink>
     <Box ml="auto" color="white">
       {body}

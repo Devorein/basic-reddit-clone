@@ -1,15 +1,15 @@
 import { GraphQLResolveInfo } from 'graphql';
 import {
-  Arg,
-  Ctx,
-  FieldResolver,
-  Info,
-  Int,
-  Mutation,
-  Query,
-  Resolver,
-  Root,
-  UseMiddleware
+	Arg,
+	Ctx,
+	FieldResolver,
+	Info,
+	Int,
+	Mutation,
+	Query,
+	Resolver,
+	Root,
+	UseMiddleware,
 } from 'type-graphql';
 import { getConnection } from 'typeorm';
 import Post from '../entities/Post';
@@ -121,7 +121,7 @@ export class PostResolver {
 		@Arg('id', () => Int)
 		id: number
 	): Promise<Post | undefined> {
-		return Post.findOne(id, {relations: ['creator']});
+		return Post.findOne(id, { relations: ['creator'] });
 	}
 
 	@Mutation(() => Post)
@@ -157,12 +157,14 @@ export class PostResolver {
 	}
 
 	@Mutation(() => Boolean)
+	@UseMiddleware(isAuth)
 	async deletePost(
 		@Arg('id', () => Int)
-		id: number
+		id: number,
+		@Ctx() { req }: Context
 	): Promise<boolean> {
 		try {
-			await Post.delete(id);
+			await Post.delete({ id, creatorId: req.session.user_id });
 			return true;
 		} catch (err) {
 			return false;
