@@ -1,4 +1,4 @@
-import { DeleteIcon } from "@chakra-ui/icons";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { Box, Button, Flex, Heading, IconButton, Link, Stack, Text } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
@@ -33,8 +33,11 @@ const Index = () => {
             <Heading fontSize="sm">by {post.creator.username}</Heading>
             <Text mt={4}>{post.textSnippet}</Text>
           </Box>
-          {meData?.me && post.creatorId === meData.me.id && <Flex cursor="pointer" m={5} align="center">
-            <IconButton aria-label="Delete Post" colorScheme="red" icon={<DeleteIcon size={20} color="white" />}
+          {meData?.me && post.creatorId === meData.me.id && <Flex cursor="pointer" m={5} align="center" direction="column" justifyContent="center">
+            <NextLink href="/post/edit/[id]" as={`/post/edit/${post.id}`}>
+              <IconButton m={3} as={Link} aria-label="Update Post" colorScheme="blue" icon={<EditIcon size={20} />} />
+            </NextLink>
+            <IconButton m={3} aria-label="Delete Post" colorScheme="red" icon={<DeleteIcon size={20} />}
               onClick={async () => {
                 await deletePost({
                   id: post.id
