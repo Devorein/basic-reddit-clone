@@ -1,5 +1,6 @@
 query Post($id: Int!, $lines: Int = 1) {
 	post(id: $id) {
 		...PostInfo
+    text
 	}
 }

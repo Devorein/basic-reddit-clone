@@ -307,6 +307,7 @@ export type PostQuery = (
   { __typename?: 'Query' }
   & { post?: Maybe<(
     { __typename?: 'Post' }
+    & Pick<Post, 'text'>
     & PostInfoFragment
   )> }
 );
@@ -466,6 +467,7 @@ export const PostDocument = gql`
     query Post($id: Int!, $lines: Int = 1) {
   post(id: $id) {
     ...PostInfo
+    text
   }
 }
     ${PostInfoFragmentDoc}`;
