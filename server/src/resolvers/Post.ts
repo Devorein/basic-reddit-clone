@@ -17,6 +17,7 @@ import Upvote from '../entities/Upvote';
 import { isAuth } from '../middleware/isAuth';
 import { Context } from '../types';
 import { PostInput } from '../types/Input/PostInput';
+import { PostUpdateInput } from '../types/Input/PostUpdateInput';
 import { PaginatedPosts } from '../types/Object/PaginatedPosts';
 import { checkForObjectSelection } from '../utils/checkForObjectSelection';
 import { rawToObject } from '../utils/rawToObject';
@@ -143,16 +144,19 @@ export class PostResolver {
 	}
 
 	@Mutation(() => Post, { nullable: true })
+	@UseMiddleware(isAuth)
 	async updatePost(
 		@Arg('id', () => Int)
 		id: number,
-		@Arg('title', () => String)
-		title: string
+		@Arg('input', () => PostUpdateInput)
+		input: PostUpdateInput,
+		@Ctx() { req }: Context
 	): Promise<Post | null> {
-		const post = await Post.findOne(id);
+		const post = await Post.findOne({ where: { id, creatorId: req.session.user_id } });
 		if (!post) return null;
-		await Post.update({ id }, { title });
-		post.title = title;
+		await Post.update({ id }, input);
+		if (input.title) post.title = input.title;
+		if (input.text) post.text = input.text;
 		return post;
 	}
 
