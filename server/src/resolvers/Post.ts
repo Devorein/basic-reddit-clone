@@ -152,12 +152,15 @@ export class PostResolver {
 		input: PostUpdateInput,
 		@Ctx() { req }: Context
 	): Promise<Post | null> {
-		const post = await Post.findOne({ where: { id, creatorId: req.session.user_id } });
-		if (!post) return null;
-		await Post.update({ id }, input);
-		if (input.title) post.title = input.title;
-		if (input.text) post.text = input.text;
-		return post;
+		return (
+			await getConnection()
+				.createQueryBuilder()
+				.update(Post)
+				.set(input)
+				.where({ id, creatorId: req.session.user_id })
+				.returning('*')
+				.execute()
+		).raw[0];
 	}
 
 	@Mutation(() => Boolean)
