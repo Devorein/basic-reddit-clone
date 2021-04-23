@@ -1,7 +1,8 @@
-import { Button, Center, Spinner } from '@chakra-ui/react';
+import { Button } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import { withUrqlClient } from 'next-urql';
 import React from 'react';
+import FullPageSpinner from '../../../components/FullPageSpinner';
 import InputField from '../../../components/InputField';
 import Layout from '../../../components/Layout';
 import { useUpdatePostMutation } from '../../../generated/graphql';
@@ -26,16 +27,7 @@ const EditPost = () => {
     }
   </Formik>;
   </Layout> :
-    <Center bg="tomato" h="100vh" color="white">
-      <Spinner
-        thickness="4px"
-        speed="0.65s"
-        emptyColor="gray.200"
-        color="black"
-        size="xl"
-      />
-    </Center>
-
+    <FullPageSpinner />
 }
 
 export default withUrqlClient(createUrqlClient)(EditPost);
