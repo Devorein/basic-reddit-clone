@@ -1,6 +1,5 @@
 import { Button } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
-import { withUrqlClient } from "next-urql";
 import { useRouter } from 'next/router';
 import React from 'react';
 import FullPageSpinner from '../components/FullPageSpinner';
@@ -8,15 +7,15 @@ import InputField from '../components/InputField';
 import Layout from '../components/Layout';
 import { useCreatePostMutation } from '../generated/graphql';
 import { useIsAuth } from '../hooks/useIsAuth';
-import { createUrqlClient } from "../utils/createUrqlClient";
+
 const CreatePost = () => {
   const router = useRouter();
   const { meData, meFetching } = useIsAuth();
 
-  const [, createPost] = useCreatePostMutation();
+  const [createPost] = useCreatePostMutation();
   return meData && !meFetching ? <Layout><Formik initialValues={{ text: '', title: '' }} onSubmit={async (values) => {
-    const response = await createPost({ input: values })
-    if (!response.error)
+    const response = await createPost({ variables: { input: values } })
+    if (!response.errors)
       router.push("/");
   }}>
     {({ isSubmitting }) =>
@@ -30,4 +29,4 @@ const CreatePost = () => {
   </Layout> : <FullPageSpinner />
 }
 
-export default withUrqlClient(createUrqlClient)(CreatePost);
+export default CreatePost;

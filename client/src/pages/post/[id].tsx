@@ -1,10 +1,8 @@
 import { Heading, Text } from "@chakra-ui/react";
-import { withUrqlClient } from 'next-urql';
 import React from 'react';
 import Layout from '../../components/Layout';
 import { MutatePostButtons } from "../../components/MutatePostButtons";
 import { usePostById } from "../../hooks/usePostById";
-import { createUrqlClient } from '../../utils/createUrqlClient';
 
 const Post = () => {
   const { postFetching, postError, postData } = usePostById();
@@ -29,6 +27,4 @@ const Post = () => {
   </Layout>
 }
 
-export default withUrqlClient(createUrqlClient, {
-  ssr: true
-})(Post);
+export default Post;
