@@ -15,7 +15,11 @@ const CreatePost = () => {
 
   const [createPost] = useCreatePostMutation();
   return meData && !meFetching ? <Layout><Formik initialValues={{ text: '', title: '' }} onSubmit={async (values) => {
-    const response = await createPost({ variables: { input: values } })
+    const response = await createPost({
+      variables: { input: values }, update(cache) {
+        cache.evict({ fieldName: 'posts:{}' })
+      }
+    })
     if (!response.errors)
       router.push("/");
   }}>
