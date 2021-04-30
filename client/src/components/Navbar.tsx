@@ -8,9 +8,9 @@ import { isServer } from '../utils/isServer';
 const Navbar = () => {
   const router = useRouter();
 
-  const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
-  const [{ data: meData }] = useMeQuery({
-    pause: isServer()
+  const [logout, { loading: logoutFetching }] = useLogoutMutation();
+  const { data: meData } = useMeQuery({
+    skip: isServer()
   });
   let body = null;
 

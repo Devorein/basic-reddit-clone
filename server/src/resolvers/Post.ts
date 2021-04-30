@@ -72,12 +72,7 @@ export class PostResolver {
 			});
 			return true;
 		} else if (upvote && upvote.value !== point) {
-			let amount = point;
-			if (upvote.value === -1 && point === 0) amount = 1;
-			else if (upvote.value === -1 && point === 1) amount = 2;
-			else if (upvote.value === 1 && point === 0) amount = -1;
-			else if (upvote.value === 1 && point === -1) amount = -2;
-
+			const amount = point - upvote.value;
 			await getConnection().transaction(async (tm) => {
 				await tm.query(`
           UPDATE upvote
@@ -110,7 +105,7 @@ export class PostResolver {
 			.createQueryBuilder()
 			.select('value')
 			.from(Upvote, 'u')
-			.where(`u."userId" = ${req.session.user_id}  and u."postId" = p.id`)
+			.where(`u."userId" = ${req.session.user_id} and u."postId" = p.id`)
 			.getQuery();
 
 		req.session.user_id && qb.addSelect(`(${subQuery})`, 'voteStatus');

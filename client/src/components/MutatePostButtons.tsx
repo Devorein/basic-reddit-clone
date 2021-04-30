@@ -11,8 +11,8 @@ interface MutatePostButtonsProps {
 }
 
 export const MutatePostButtons: React.FC<MutatePostButtonsProps> = ({ direction, id, creatorId }) => {
-  const [, deletePost] = useDeletePostMutation();
-  const [{ data: meData }] = useMeQuery();
+  const [deletePost] = useDeletePostMutation();
+  const { data: meData } = useMeQuery();
 
   return meData?.me && creatorId === meData.me.id ? <Flex cursor="pointer" m={5} align="center" direction={direction ?? "column"} justifyContent="center">
     <NextLink href="/post/edit/[id]" as={`/post/edit/${id}`}>
@@ -21,7 +21,9 @@ export const MutatePostButtons: React.FC<MutatePostButtonsProps> = ({ direction,
     <IconButton m={3} aria-label="Delete Post" colorScheme="red" icon={<DeleteIcon size={20} />}
       onClick={async () => {
         await deletePost({
-          id
+          variables: {
+            id
+          }
         })
       }}
     />

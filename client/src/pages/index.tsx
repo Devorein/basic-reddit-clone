@@ -1,12 +1,10 @@
 import { Box, Button, Flex, Heading, Link, Stack, Text } from "@chakra-ui/react";
-import { withUrqlClient } from "next-urql";
 import NextLink from "next/link";
 import React, { useState } from "react";
 import Layout from "../components/Layout";
 import { MutatePostButtons } from "../components/MutatePostButtons";
 import VoteSection from '../components/VoteSection';
 import { PostsQueryVariables, usePostsQuery } from "../generated/graphql";
-import { createUrqlClient } from "../utils/createUrqlClient";
 
 const Index = () => {
   const [postQueryVariables, setPostQueryVariables] = useState<PostsQueryVariables>({
@@ -14,9 +12,10 @@ const Index = () => {
     cursor: null
   });
 
-  const [{ data: postsData, fetching: fetchingPosts }] = usePostsQuery({
+  const { data: postsData, loading: fetchingPosts } = usePostsQuery({
     variables: postQueryVariables
   });
+
   return (
     <Layout>
       {fetchingPosts ? <div>Loading ...</div> : postsData && <Stack spacing={5}> {postsData.posts.posts.map(post => !post ? null :
@@ -49,4 +48,4 @@ const Index = () => {
   )
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Index);
+export default Index;
