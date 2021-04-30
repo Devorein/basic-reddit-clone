@@ -1,10 +1,41 @@
+import { ApolloCache, gql } from '@apollo/client';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import { Box, Flex, IconButton } from '@chakra-ui/react';
 import React, { useState } from 'react';
-import { PostInfoFragment, useMeQuery, useVoteMutation } from '../generated/graphql';
+import { PostInfoFragment, useMeQuery, useVoteMutation, VoteMutation } from '../generated/graphql';
 
 interface Props {
   post: PostInfoFragment
+}
+
+function updateVote(value: number, postId: number, cache: ApolloCache<VoteMutation>) {
+  const data = cache.readFragment<PostInfoFragment>({
+    fragment: gql`
+    fragment _ on Post {
+      id
+      points
+      voteStatus
+    }
+  `,
+    id: `Post:${postId}`
+  }
+  );
+  if (data) {
+    const amount = value - data.voteStatus!;
+    const newPoints = data.points + amount;
+    cache.writeFragment({
+      fragment: gql`
+      fragment __ on Post {
+        id
+        points
+        voteStatus
+      }
+    `,
+      id: `Post:${postId}`,
+      data: { points: newPoints, voteStatus: value }
+    }
+    );
+  }
 }
 
 export default function VoteSection({ post }: Props) {
@@ -20,6 +51,9 @@ export default function VoteSection({ post }: Props) {
           variables: {
             postId: post.id,
             value: post.voteStatus === 1 ? 0 : 1
+          },
+          update(cache) {
+            updateVote(post.voteStatus === 1 ? 0 : 1, post.id, cache)
           }
         })
         setLoadingState('not-loading');
@@ -33,6 +67,9 @@ export default function VoteSection({ post }: Props) {
           variables: {
             postId: post.id,
             value: post.voteStatus === -1 ? 0 : -1
+          },
+          update(cache) {
+            updateVote(post.voteStatus === -1 ? 0 : -1, post.id, cache)
           }
         })
         setLoadingState('not-loading');

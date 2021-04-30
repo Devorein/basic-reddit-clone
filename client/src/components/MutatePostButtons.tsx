@@ -23,6 +23,9 @@ export const MutatePostButtons: React.FC<MutatePostButtonsProps> = ({ direction,
         await deletePost({
           variables: {
             id
+          },
+          update(cache) {
+            cache.evict({ id: `Post:${id}` })
           }
         })
       }}
