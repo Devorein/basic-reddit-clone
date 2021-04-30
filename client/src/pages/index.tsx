@@ -1,19 +1,17 @@
 import { Box, Button, Flex, Heading, Link, Stack, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
-import React, { useState } from "react";
+import React from "react";
 import Layout from "../components/Layout";
 import { MutatePostButtons } from "../components/MutatePostButtons";
 import VoteSection from '../components/VoteSection';
-import { PostsQueryVariables, usePostsQuery } from "../generated/graphql";
+import { usePostsQuery } from "../generated/graphql";
 
 const Index = () => {
-  const [postQueryVariables, setPostQueryVariables] = useState<PostsQueryVariables>({
-    limit: 10,
-    cursor: null
-  });
-
-  const { data: postsData, loading: fetchingPosts } = usePostsQuery({
-    variables: postQueryVariables
+  const { data: postsData, loading: fetchingPosts, fetchMore, variables } = usePostsQuery({
+    variables: {
+      limit: 10,
+      cursor: null
+    }
   });
 
   return (
@@ -36,9 +34,11 @@ const Index = () => {
       </Stack>}
       {postsData && postsData.posts.hasMore && <Flex>
         <Button onClick={() => {
-          setPostQueryVariables({
-            limit: postQueryVariables.limit,
-            cursor: postsData.posts.posts[postsData.posts.posts.length - 1].createdAt
+          fetchMore({
+            variables: {
+              limit: variables?.limit,
+              cursor: postsData.posts.posts[postsData.posts.posts.length - 1].createdAt
+            }
           })
         }} isLoading={fetchingPosts} colorScheme="red" m={"auto"} fontWeight="bold" padding="3" my={5}>
           Load more
