@@ -5,6 +5,7 @@ import React from 'react';
 import InputField from '../components/InputField';
 import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
+import { withApollo } from "../utils/withApollo";
 
 const Login = () => {
   const router = useRouter();
@@ -35,4 +36,4 @@ const Login = () => {
   )
 }
 
-export default Login;
+export default withApollo({ ssr: false })(Login)

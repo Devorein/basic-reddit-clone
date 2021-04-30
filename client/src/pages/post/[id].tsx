@@ -3,6 +3,7 @@ import React from 'react';
 import Layout from '../../components/Layout';
 import { MutatePostButtons } from "../../components/MutatePostButtons";
 import { usePostById } from "../../hooks/usePostById";
+import { withApollo } from "../../utils/withApollo";
 
 const Post = () => {
   const { postFetching, postError, postData } = usePostById();
@@ -27,4 +28,4 @@ const Post = () => {
   </Layout>
 }
 
-export default Post;
+export default withApollo({ ssr: true })(Post)

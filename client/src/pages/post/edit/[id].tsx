@@ -6,6 +6,7 @@ import InputField from '../../../components/InputField';
 import Layout from '../../../components/Layout';
 import { useUpdatePostMutation } from '../../../generated/graphql';
 import { usePostById } from '../../../hooks/usePostById';
+import { withApollo } from '../../../utils/withApollo';
 
 const EditPost = () => {
   const { router, intId, meData, meFetching, postData, postFetching } = usePostById();
@@ -28,4 +29,4 @@ const EditPost = () => {
     <FullPageSpinner />
 }
 
-export default EditPost;
+export default withApollo({ ssr: false })(EditPost)

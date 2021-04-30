@@ -5,6 +5,7 @@ import React from 'react';
 import InputField from '../components/InputField';
 import { useRegisterMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/toErrorMap";
+import { withApollo } from "../utils/withApollo";
 
 const Register = () => {
   const router = useRouter();
@@ -30,4 +31,4 @@ const Register = () => {
   )
 }
 
-export default Register
+export default withApollo({ ssr: false })(Register)
